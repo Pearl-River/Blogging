@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Table from "../../components/table/Table";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebase-config";
 import ActionEdit from "../../components/action/ActionEdit";
 import ActionDelete from "../../components/action/ActionDelete";
 import { useNavigate } from "react-router-dom";
 import { userRole, userStatus } from "../../utils/constants";
 import LabelStatus from "../../components/label/LabelStatus";
+import { deleteUser } from "firebase/auth";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const UserTable = () => {
   const [userList, setUserList] = useState([]);
@@ -39,14 +42,33 @@ const UserTable = () => {
   const renderLabelRole = (role) => {
     switch (role) {
       case userRole.ADMIN:
-        return <LabelStatus>Admin</LabelStatus>;
+        return <LabelStatus type="default">Admin</LabelStatus>;
       case userRole.MOD:
-        return <LabelStatus>Mod</LabelStatus>;
+        return <LabelStatus type="default">Mod</LabelStatus>;
       case userRole.USER:
-        return <LabelStatus>User</LabelStatus>;
+        return <LabelStatus type="default">User</LabelStatus>;
       default:
         break;
     }
+  };
+  const handleDeleteUser = async (user) => {
+    const colRef = doc(db, "users", user.id);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteDoc(colRef);
+        await deleteUser(user);
+        toast.success("Delete user successfully!");
+        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+      }
+    });
   };
   return (
     <div>
@@ -96,7 +118,7 @@ const UserTable = () => {
                       }
                     ></ActionEdit>
                     <ActionDelete
-                    //   onClick={() => handleDeleteCategory(category.id)}
+                      onClick={() => handleDeleteUser(user)}
                     ></ActionDelete>
                   </div>
                 </td>
