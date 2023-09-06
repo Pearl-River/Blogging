@@ -12,6 +12,9 @@ import PostAddNew from "./module/post/PostAddNew";
 import CategoryManage from "./module/category/CategoryManage";
 import CategoryAddNew from "./module/category/CategoryAddNew";
 import CategoryUpdate from "./module/category/CategoryUpdate";
+import UserManage from "./module/user/UserManage";
+import UserAddNew from "./module/user/UserAddNew";
+import UserProfile from "./module/user/UserProfile";
 
 function App() {
   return (
@@ -59,22 +62,22 @@ function App() {
               path="/manage/update-category"
               element={<CategoryUpdate></CategoryUpdate>}
             ></Route>
-            {/* <Route
-                path="/manage/user"
-                element={<UserManage></UserManage>}
-              ></Route>
-              <Route
-                path="/manage/add-user"
-                element={<UserAddNew></UserAddNew>}
-              ></Route>
-              <Route
-                path="/manage/update-user"
-                element={<UserUpdate></UserUpdate>}
-              ></Route>
-              <Route
-                path="/profile"
-                element={<UserProfile></UserProfile>}
-              ></Route> */}
+            <Route
+              path="/manage/user"
+              element={<UserManage></UserManage>}
+            ></Route>
+            <Route
+              path="/manage/add-user"
+              element={<UserAddNew></UserAddNew>}
+            ></Route>
+            <Route
+              path="/manage/update-user"
+              // element={<UserUpdate></UserUpdate>}
+            ></Route>
+            <Route
+              path="/profile"
+              element={<UserProfile></UserProfile>}
+            ></Route>
           </Route>
         </Routes>
       </AuthProvider>
