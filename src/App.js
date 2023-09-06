@@ -15,6 +15,7 @@ import CategoryUpdate from "./module/category/CategoryUpdate";
 import UserManage from "./module/user/UserManage";
 import UserAddNew from "./module/user/UserAddNew";
 import UserProfile from "./module/user/UserProfile";
+import UserUpdate from "./module/user/UserUpdate";
 
 function App() {
   return (
@@ -72,7 +73,7 @@ function App() {
             ></Route>
             <Route
               path="/manage/update-user"
-              // element={<UserUpdate></UserUpdate>}
+              element={<UserUpdate></UserUpdate>}
             ></Route>
             <Route
               path="/profile"
