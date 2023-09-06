@@ -181,7 +181,6 @@ const PostAddNew = () => {
                 name="status"
                 control={control}
                 checked={Number(watchStatus) === postStatus.APPROVED}
-                // onClick={() => setValue("status", "approved")}
                 value={postStatus.APPROVED}
               >
                 Approved
@@ -190,7 +189,6 @@ const PostAddNew = () => {
                 name="status"
                 control={control}
                 checked={Number(watchStatus) === postStatus.PENDING}
-                // onClick={() => setValue("status", "pending")}
                 value={postStatus.PENDING}
               >
                 Pending
@@ -199,7 +197,6 @@ const PostAddNew = () => {
                 name="status"
                 control={control}
                 checked={Number(watchStatus) === postStatus.REJECTED}
-                // onClick={() => setValue("status", "reject")}
                 value={postStatus.REJECTED}
               >
                 Reject

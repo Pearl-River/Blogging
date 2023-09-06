@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
-const NotFoundPageStyles = styled.div`
+const PageNotFoundStyles = styled.div`
   height: 100vh;
   display: flex;
   align-items: center;
@@ -27,9 +27,9 @@ const NotFoundPageStyles = styled.div`
   }
 `;
 
-const NotFoundPage = () => {
+const PageNotFound = () => {
   return (
-    <NotFoundPageStyles>
+    <PageNotFoundStyles>
       <NavLink to="/" className={"logo"}>
         <img srcSet="/logo.png 2x" alt="blogging" />
       </NavLink>
@@ -37,8 +37,8 @@ const NotFoundPage = () => {
       <NavLink to="/" className={"back"}>
         Back to home
       </NavLink>
-    </NotFoundPageStyles>
+    </PageNotFoundStyles>
   );
 };
 
-export default NotFoundPage;
+export default PageNotFound;
