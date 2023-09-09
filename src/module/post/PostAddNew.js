@@ -21,8 +21,12 @@ import {
   query,
   where,
   serverTimestamp,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { toast } from "react-toastify";
+import DashboardHeading from "../dashboard/DashboardHeading";
+import FieldCheckboxes from "../../components/field/FieldCheckboxes";
 
 const PostAddNewStyles = styled.div``;
 
@@ -34,9 +38,10 @@ const PostAddNew = () => {
       title: "",
       slug: "",
       status: 2,
-      categoryId: "",
       hot: false,
       image: "",
+      category: {},
+      user: {},
     },
   });
   const watchStatus = watch("status");
@@ -51,6 +56,24 @@ const PostAddNew = () => {
   const [categories, setCategories] = useState([]);
   const [selectCategory, setSelectCategory] = useState("");
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    async function fetchUserData() {
+      if (!userInfo.email) return;
+      const q = query(
+        collection(db, "users"),
+        where("email", "==", userInfo.email)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        setValue("user", {
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+    }
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo.email]);
   const addPostHandler = async (values) => {
     setLoading(true);
     try {
@@ -61,7 +84,6 @@ const PostAddNew = () => {
       await addDoc(colRef, {
         ...cloneValues,
         image,
-        userId: userInfo.uid,
         createdAt: serverTimestamp(),
       });
       toast.success("Create new post successfully!");
@@ -69,9 +91,10 @@ const PostAddNew = () => {
         title: "",
         slug: "",
         status: 2,
-        categoryId: "",
+        category: {},
         hot: false,
         image: "",
+        user: {},
       });
       handleResetUpload();
       setSelectCategory({});
@@ -103,14 +126,19 @@ const PostAddNew = () => {
     document.title = "Blogging - Add new post";
   }, []);
 
-  const handleClickOption = (item) => {
-    setValue("categoryId", item.id);
+  const handleClickOption = async (item) => {
+    const colRef = doc(db, "categories", item.id);
+    const docData = await getDoc(colRef);
+    setValue("category", {
+      id: docData.id,
+      ...docData.data(),
+    });
     setSelectCategory(item);
   };
 
   return (
     <PostAddNewStyles>
-      <h1 className="dashboard-heading">Add new post</h1>
+      <DashboardHeading title="Add post" desc="Add new post"></DashboardHeading>
       <form onSubmit={handleSubmit(addPostHandler)}>
         <div className="grid grid-cols-2 gap-x-10 mb-10">
           <Field>
@@ -176,7 +204,7 @@ const PostAddNew = () => {
           </Field>
           <Field>
             <Label>Status</Label>
-            <div className="flex items-center gap-x-5">
+            <FieldCheckboxes>
               <Radio
                 name="status"
                 control={control}
@@ -201,7 +229,7 @@ const PostAddNew = () => {
               >
                 Reject
               </Radio>
-            </div>
+            </FieldCheckboxes>
           </Field>
         </div>
         <Button
