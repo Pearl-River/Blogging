@@ -10,6 +10,7 @@ import LabelStatus from "../../components/label/LabelStatus";
 import { deleteUser } from "firebase/auth";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { useAuth } from "../../contexts/auth-context";
 
 const UserTable = () => {
   const [userList, setUserList] = useState([]);
@@ -51,7 +52,12 @@ const UserTable = () => {
         break;
     }
   };
+  const { userInfo } = useAuth();
   const handleDeleteUser = async (user) => {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const colRef = doc(db, "users", user.id);
     Swal.fire({
       title: "Are you sure?",

@@ -2,8 +2,12 @@ import React from "react";
 import DashboardHeading from "../dashboard/DashboardHeading";
 import UserTable from "./UserTable";
 import Button from "../../components/button/Button";
+import { useAuth } from "../../contexts/auth-context";
+import { userRole } from "../../utils/constants";
 
 const UserManage = () => {
+  const { userInfo } = useAuth();
+  if (userInfo.role !== userRole.ADMIN) return null;
   return (
     <div>
       <DashboardHeading

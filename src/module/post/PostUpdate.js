@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import DashboardHeading from "../dashboard/DashboardHeading";
 import Field from "../../components/field/Field";
 import Label from "../../components/label/Label";
@@ -9,9 +9,8 @@ import Toggle from "../../components/toggle/Toggle";
 import Radio from "../../components/checkbox/Radio";
 import Button from "../../components/button/Button";
 import FieldCheckboxes from "../../components/field/FieldCheckboxes";
-import { postStatus } from "../../utils/constants";
+import { postStatus, userRole } from "../../utils/constants";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   collection,
@@ -29,9 +28,13 @@ import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
 import ImageUploader from "quill-image-uploader";
 import axios from "axios";
+import slugify from "slugify";
+import { useAuth } from "../../contexts/auth-context";
+import Swal from "sweetalert2";
 Quill.register("modules/imageUploader", ImageUploader);
 
 const PostUpdate = () => {
+  const { userInfo } = useAuth();
   const [params] = useSearchParams();
   const postId = params.get("id");
   const [content, setContent] = useState("");
@@ -51,6 +54,10 @@ const PostUpdate = () => {
   const { image, setImage, progress, handleSelectImage, handleDeleteImage } =
     useFirebaseImage(setValue, getValues, imageName, deletePostImage);
   async function deletePostImage() {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const colRef = doc(db, "users", postId);
     await updateDoc(colRef, {
       avatar: "",
@@ -59,6 +66,7 @@ const PostUpdate = () => {
   useEffect(() => {
     setImage(imageUrl);
   }, [imageUrl, setImage]);
+
   const watchHot = watch("hot");
   const watchStatus = watch("status");
   useEffect(() => {
@@ -103,9 +111,16 @@ const PostUpdate = () => {
   };
   const updatePostHandler = async (values) => {
     if (!isValid) return;
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const docRef = doc(db, "posts", postId);
+    values.status = Number(values.status);
+    values.slug = slugify(values.slug || values.title, { lower: true });
     await updateDoc(docRef, {
       ...values,
+      image,
       content,
     });
     toast.success("Update post successfully!");

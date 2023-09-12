@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useController } from "react-hook-form";
-// import PropTypes from "prop-types";
+import PropTypes from "prop-types";
 
 const InputStyles = styled.div`
   position: relative;
@@ -31,7 +31,13 @@ const InputStyles = styled.div`
     cursor: pointer;
   }
 `;
-
+/**
+ *
+ * @param {*} placeholder(optional) - Placeholder of input
+ * @param {*} name(optional) - name of input
+ * @param {*} control - control from react hook form
+ * @returns Input
+ */
 const Input = ({ name = "", type = "text", children, control, ...props }) => {
   const { field } = useController({
     control,
@@ -45,5 +51,10 @@ const Input = ({ name = "", type = "text", children, control, ...props }) => {
     </InputStyles>
   );
 };
-
+Input.propTypes = {
+  name: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  children: PropTypes.any,
+  control: PropTypes.any.isRequired,
+};
 export default Input;

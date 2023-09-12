@@ -8,10 +8,12 @@ import Radio from "../../components/checkbox/Radio";
 import Button from "../../components/button/Button";
 import FieldCheckboxes from "../../components/field/FieldCheckboxes";
 import slugify from "slugify";
-import { categoryStatus } from "../../utils/constants";
+import { categoryStatus, userRole } from "../../utils/constants";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase/firebase-config";
 import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/auth-context";
+import Swal from "sweetalert2";
 
 const CategoryAddNew = () => {
   const {
@@ -29,8 +31,13 @@ const CategoryAddNew = () => {
       createdAt: new Date(),
     },
   });
+  const { userInfo } = useAuth();
   const handleAddNewCategory = async (values) => {
     if (!isValid) return;
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const newValues = { ...values };
     newValues.slug = slugify(newValues.name || newValues.slug, {
       lower: true,

@@ -19,8 +19,10 @@ import ActionEdit from "../../components/action/ActionEdit";
 import ActionDelete from "../../components/action/ActionDelete";
 import Swal from "sweetalert2";
 import LabelStatus from "../../components/label/LabelStatus";
-import { postStatus } from "../../utils/constants";
+import { postStatus, userRole } from "../../utils/constants";
 import { debounce } from "lodash";
+import { useAuth } from "../../contexts/auth-context";
+import DashboardHeading from "../dashboard/DashboardHeading";
 
 const POST_PER_PAGE = 10;
 
@@ -30,7 +32,7 @@ const PostManage = () => {
   const [lastDoc, setLastDoc] = useState();
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
-
+  const { userInfo } = useAuth();
   useEffect(() => {
     async function fetchData() {
       const colRef = collection(db, "posts");
@@ -73,9 +75,11 @@ const PostManage = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
-      if (result.isConfirmed) {
+      if (result.isConfirmed && userInfo?.role === userRole.ADMIN) {
         await deleteDoc(docRef);
         Swal.fire("Deleted!", "Your post has been deleted.", "success");
+      } else {
+        Swal.fire("Failed!", "You have no right to delete post", "warning");
       }
     });
   }
@@ -116,14 +120,18 @@ const PostManage = () => {
       documentSnapshots.docs[documentSnapshots.docs.length - 1];
     setLastDoc(lastVisible);
   };
+  if (userInfo.role !== userRole.ADMIN) return null;
   return (
     <div>
-      <h1 className="dashboard-heading">Manage post</h1>
-      <div className="mb-10 flex justify-end">
+      <DashboardHeading
+        title="All posts"
+        desc="Manage all posts"
+      ></DashboardHeading>
+      <div className="flex justify-end gap-5 mb-10">
         <div className="w-full max-w-[300px]">
           <input
             type="text"
-            className="w-full p-4 rounded-lg border border-solid border-gray-300"
+            className="w-full p-4 border border-gray-300 border-solid rounded-lg"
             placeholder="Search post..."
             onChange={handleSearchPost}
           />
@@ -147,10 +155,11 @@ const PostManage = () => {
                 ? new Date(post?.createdAt?.seconds * 1000)
                 : new Date();
               const formatDate = new Date(date).toLocaleDateString("vi-VI");
+
               return (
                 <tr key={post.id}>
-                  <td title={post.id}>{post.id?.slice(0, 5) + "..."}</td>
-                  <td>
+                  <td>{post.id?.slice(0, 5) + "..."}</td>
+                  <td className="!pr-[100px]">
                     <div className="flex items-center gap-x-3">
                       <img
                         src={post.image}
@@ -173,7 +182,7 @@ const PostManage = () => {
                   </td>
                   <td>{renderPostStatus(post.status)}</td>
                   <td>
-                    <div className="flex items-center gap-x-3 text-gray-500">
+                    <div className="flex items-center text-gray-500 gap-x-3">
                       <ActionView
                         onClick={() => navigate(`/${post.slug}`)}
                       ></ActionView>

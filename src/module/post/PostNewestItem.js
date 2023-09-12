@@ -4,13 +4,14 @@ import PostCategory from "./PostCategory";
 import PostTitle from "./PostTitle";
 import PostMeta from "./PostMeta";
 import PostImage from "./PostImage";
+import slugify from "slugify";
 const PostNewestItemStyles = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
   margin-bottom: 28px;
   padding-bottom: 28px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #ddd;
   &:last-child {
     padding-bottom: 0;
     margin-bottom: 0;
@@ -27,24 +28,44 @@ const PostNewestItemStyles = styled.div`
     &-category {
       margin-bottom: 8px;
     }
+    &-content {
+      flex: 1;
+    }
+
     &-title {
       margin-bottom: 8px;
     }
   }
+  @media screen and (max-width: 1023.98px) {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    .post {
+      &-image {
+        width: 140px;
+        height: 100px;
+      }
+    }
+  }
 `;
-const PostNewestItem = () => {
+const PostNewestItem = ({ data }) => {
+  const date = data?.createdAt?.seconds
+    ? new Date(data?.createdAt?.seconds * 1000)
+    : new Date();
+  const formatDate = new Date(date).toLocaleDateString("vi-VI");
+  if (!data.id) return null;
   return (
     <PostNewestItemStyles>
-      <PostImage
-        url="https://images.unsplash.com/photo-1510519138101-570d1dca3d66?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2294&q=80"
-        alt=""
-      ></PostImage>
+      <PostImage url={data?.image} alt="" to={data?.slug}></PostImage>
       <div className="post-content">
-        <PostCategory type="secondary">Kiến thức</PostCategory>
-        <PostTitle>
-          Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
-        </PostTitle>
-        <PostMeta></PostMeta>
+        <PostCategory to={data?.category?.slug} type="secondary">
+          {data?.category?.name}
+        </PostCategory>
+        <PostTitle to={data?.slug}>{data?.title}</PostTitle>
+        <PostMeta
+          to={slugify(data?.user?.username || "", { lower: true })}
+          authorName={data?.user?.fullname}
+          date={formatDate}
+        ></PostMeta>
       </div>
     </PostNewestItemStyles>
   );

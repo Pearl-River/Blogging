@@ -5,6 +5,7 @@ import PostTitle from "./PostTitle";
 import PostMeta from "./PostMeta";
 import PostImage from "./PostImage";
 import slugify from "slugify";
+import { withErrorBoundary } from "react-error-boundary";
 
 const PostFeatureItemStyles = styled.div`
   width: 100%;
@@ -21,12 +22,7 @@ const PostFeatureItemStyles = styled.div`
       position: absolute;
       inset: 0;
       border-radius: 16px;
-      background: linear-gradient(
-        179.77deg,
-        #6b6b6b 36.45%,
-        rgba(163, 163, 163, 0.622265) 63.98%,
-        rgba(255, 255, 255, 0) 99.8%
-      );
+      background-color: rgba(0, 0, 0, 0.75);
       mix-blend-mode: multiply;
       opacity: 0.6;
     }
@@ -48,6 +44,13 @@ const PostFeatureItemStyles = styled.div`
   @media screen and (min-width: 1024px) {
     height: 272px;
   }
+  @media screen and (max-width: 1023.98px) {
+    .post {
+      &-content {
+        padding: 15px;
+      }
+    }
+  }
 `;
 const PostFeatureItem = ({ data }) => {
   if (!data || !data.id) return null;
@@ -63,11 +66,11 @@ const PostFeatureItem = ({ data }) => {
       <div className="post-content">
         <div className="post-top">
           {category?.name && (
-            <PostCategory to={category.slug}>{category.name}</PostCategory>
+            <PostCategory to={category.slug}>{category?.name}</PostCategory>
           )}
           <PostMeta
-            to={slugify(user?.fullname || "", { lower: true })}
-            authorName={user?.name}
+            to={slugify(user?.username || "", { lower: true })}
+            authorName={user?.fullname}
             date={formatDate}
           ></PostMeta>
         </div>
@@ -78,5 +81,11 @@ const PostFeatureItem = ({ data }) => {
     </PostFeatureItemStyles>
   );
 };
-
-export default PostFeatureItem;
+// Example of error boundary
+export default withErrorBoundary(PostFeatureItem, {
+  FallbackComponent: (
+    <p className="p-3 text-red-500 bg-red-100">
+      Look like this component error
+    </p>
+  ),
+});

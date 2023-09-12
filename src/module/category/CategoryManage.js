@@ -18,10 +18,11 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase/firebase-config";
-import { categoryStatus } from "../../utils/constants";
+import { categoryStatus, userRole } from "../../utils/constants";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
+import { useAuth } from "../../contexts/auth-context";
 
 const CATEGORY_PER_PAGE = 10;
 
@@ -37,7 +38,6 @@ const CategoryManage = () => {
       startAfter(lastDoc || 0),
       limit(CATEGORY_PER_PAGE)
     );
-
     onSnapshot(nextRef, (snapshot) => {
       let results = [];
       snapshot.forEach((doc) => {
@@ -85,7 +85,12 @@ const CategoryManage = () => {
     }
     fetchData();
   }, [filter]);
+  const { userInfo } = useAuth();
   const handleDeleteCategory = async (docId) => {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const colRef = doc(db, "categories", docId);
     Swal.fire({
       title: "Are you sure?",
@@ -149,7 +154,9 @@ const CategoryManage = () => {
                 </td>
                 <td>
                   <div className="flex items-center gap-x-3">
-                    <ActionView></ActionView>
+                    <ActionView
+                      onClick={() => navigate(`/category/${category.slug}`)}
+                    ></ActionView>
                     <ActionEdit
                       onClick={() =>
                         navigate(`/manage/update-category?id=${category.id}`)

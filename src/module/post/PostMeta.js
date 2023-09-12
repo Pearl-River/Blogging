@@ -1,8 +1,8 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-const PostMeTaStyles = styled.div`
+const PostMetaStyles = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -18,22 +18,25 @@ const PostMeTaStyles = styled.div`
       border-radius: 100rem;
     }
   }
+  @media screen and (max-width: 1023.98px) {
+    font-size: 10px;
+    gap: 6px;
+  }
 `;
-
 const PostMeta = ({
   date = "Mar 23",
   authorName = "Andiez Le",
   className = "",
-  to = "/",
+  to = "",
 }) => {
   return (
-    <PostMeTaStyles className={className}>
+    <PostMetaStyles className={className}>
       <span className="post-time">{date}</span>
       <span className="post-dot"></span>
-      <NavLink to={to}>
+      <Link to={`/author/${to}`}>
         <span className="post-author">{authorName}</span>
-      </NavLink>
-    </PostMeTaStyles>
+      </Link>
+    </PostMetaStyles>
   );
 };
 

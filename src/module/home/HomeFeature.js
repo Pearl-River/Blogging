@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Heading from "../../components/layout/Heading";
 import PostFeatureItem from "../post/PostFeatureItem";
@@ -11,6 +10,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { withErrorBoundary } from "react-error-boundary";
 const HomeFeatureStyles = styled.div``;
 
 const HomeFeature = () => {
@@ -38,7 +38,7 @@ const HomeFeature = () => {
   return (
     <HomeFeatureStyles className="home-block">
       <div className="container">
-        <Heading>Bài viết nổi bật</Heading>
+        <Heading>Featured posts</Heading>
         <div className="grid-layout">
           {posts.map((post) => (
             <PostFeatureItem key={post.id} data={post}></PostFeatureItem>
@@ -48,5 +48,11 @@ const HomeFeature = () => {
     </HomeFeatureStyles>
   );
 };
-
-export default HomeFeature;
+// Example of error boundary
+export default withErrorBoundary(HomeFeature, {
+  FallbackComponent: (
+    <p className="p-3 text-red-500 bg-red-100">
+      Look like this component error
+    </p>
+  ),
+});
